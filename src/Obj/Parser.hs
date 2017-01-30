@@ -1,5 +1,6 @@
 module Obj.Parser
     ( ObjType (..)
+    , Face (..)
     , parseFromFile
     ) where
 
