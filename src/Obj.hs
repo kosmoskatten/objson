@@ -2,8 +2,8 @@ module Obj
     ( toJSON
     ) where
 
-import           Data.Vector (Vector, fromList)
-import           Obj.JSON    (Triangle)
+import           Data.Vector (Vector, fromList, (!))
+import           Obj.JSON    (Triangle (..), Vertex (..))
 import           Obj.Parser  (Face (..), ObjType (..), parseFromFile)
 import           Obj.Vec3    (Vec3)
 
@@ -14,26 +14,33 @@ toJSON file = do
         Right objs -> return $ makeTriangles objs
         Left err   -> return $ Left err
 
--- | TODO: un-iofy it later ...
 makeTriangles :: [ObjType] -> (Either String [Triangle])
 makeTriangles objs =
-    let vertices = grep grepVertex objs
-        normals  = grep grepNormal objs
+    let vertices = fromList $ grep grepVertex objs
+        normals  = fromList $ grep grepNormal objs
         faces    = grep grepFace objs
         groups   = grep grepGroup objs
     in
         if length groups > 2 then
-            Left "To many polygon groups. Sorry :-("
+            Left "Too many polygon groups. Sorry :-("
         else
-            Right []
+            Right $ map (makeTriangle vertices normals) faces
 
 makeTriangle :: Vector Vec3 -> Vector Vec3 -> Face -> Triangle
 makeTriangle vertices normals (VertexFace v1 v2 v3) = undefined
-makeTriangle vertices normals (VertexNormalFace (v1, n1) (v2, n2) (v3, n3)) = undefined
+makeTriangle vertices normals (VertexNormalFace (v1, n1) (v2, n2) (v3, n3)) =
+    Triangle
+        { vertex1 = Vertex { position = vertices ! ind v1, normal = normals ! ind n1 }
+        , vertex2 = Vertex { position = vertices ! ind v2, normal = normals ! ind n2 }
+        , vertex3 = Vertex { position = vertices ! ind v3, normal = normals ! ind n3 }
+        }
+
+ind :: Int -> Int
+ind n = n - 1
 
 grepVertex :: ObjType -> Maybe Vec3
-grepVertex (Vertex v) = Just v
-grepVertex _          = Nothing
+grepVertex (VertexCoord v) = Just v
+grepVertex _               = Nothing
 
 grepNormal :: ObjType -> Maybe Vec3
 grepNormal (VertexNormal vn) = Just vn

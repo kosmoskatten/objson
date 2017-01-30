@@ -15,7 +15,7 @@ import           Text.Megaparsec.ByteString.Lazy
 import qualified Text.Megaparsec.Lexer           as L
 
 data ObjType
-    = Vertex !Vec3
+    = VertexCoord !Vec3
     | VertexNormal !Vec3
     | Face !Face
     | PolygonGroup !String
@@ -44,14 +44,14 @@ parseObjData :: Parser [ObjType]
 parseObjData = manyTill (sc *> objType) eof
     where
         objType :: Parser ObjType
-        objType = (try vertex)
+        objType = (try vertexCoord)
               <|> vertexNormal
               <|> face
               <|> polygonGroup
 
-vertex :: Parser ObjType
-vertex =
-    v *> (Vertex <$> (Vec3 <$> signedFloat <*> signedFloat <*> signedFloat))
+vertexCoord :: Parser ObjType
+vertexCoord =
+    v *> (VertexCoord <$> (Vec3 <$> signedFloat <*> signedFloat <*> signedFloat))
 
 vertexNormal :: Parser ObjType
 vertexNormal =
