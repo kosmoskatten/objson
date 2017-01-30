@@ -20,11 +20,10 @@ data ObjType
     | PolygonGroup !String
     deriving Show
 
+-- | Only supporting triangle data.
 data Face
-    = VertexFace !Int !Int !Int
-    | VertexTextureFace !Int !Int
-    | VertexTextureNormalFace !Int !Int !Int
-    | VertexNormalFace !Int !Int
+    = VertexFace !Int !Int !Int -- ^ v1 v2 v3
+    | VertexNormalFace !(Int, Int) !(Int, Int) !(Int, Int) -- ^ v1/n1 v2/n2 v3/n3
     deriving Show
 
 parseFromFile :: FilePath -> IO (Either String [ObjType])
@@ -62,10 +61,17 @@ polygonGroup =
     g *> (PolygonGroup <$> getString)
 
 face :: Parser ObjType
-face = f *> (Face <$> vertexFace)
+face = f *> (Face <$> (try vertexFace <|> try vertexNormalFace))
 
 vertexFace :: Parser Face
 vertexFace = VertexFace <$> unsignedInt <*> unsignedInt <*> unsignedInt
+
+vertexNormalFace :: Parser Face
+vertexNormalFace = do
+    one   <- (,) <$> unsignedInt <*> (string "//" *> unsignedInt)
+    two   <- (,) <$> unsignedInt <*> (string "//" *> unsignedInt)
+    three <- (,) <$> unsignedInt <*> (string "//" *> unsignedInt)
+    return $ VertexNormalFace one two three
 
 sc :: Parser ()
 sc = L.space (void spaceChar) (L.skipLineComment "#") empty
