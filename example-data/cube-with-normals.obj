@@ -2,13 +2,28 @@
 #
 g cube
 
+# Front top right
 v  0.5  0.5  0.5
+
+# Front top left
 v -0.5  0.5  0.5
+
+# Front bottom left
 v -0.5 -0.5  0.5
+
+# Front bottom right
 v  0.5 -0.5  0.5
+
+# Back top right
 v  0.5  0.5 -0.5
+
+# Back top left
 v -0.5  0.5 -0.5
+
+# Back bottom left
 v -0.5 -0.5 -0.5
+
+# Back bottom right
 v  0.5 -0.5 -0.5
 
 vn  0.0  0.0  1.0
@@ -28,5 +43,5 @@ f  4//4  3//4  8//4
 f  4//4  8//4  7//4
 f  5//5  1//5  4//5
 f  5//5  4//5  7//5
-f  2//6  6//6  8//6
-f  2//6  8//6  3//6
+f  2//6  6//6  7//6
+f  2//6  7//6  3//6
